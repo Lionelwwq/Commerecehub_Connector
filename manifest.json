@@ -1,0 +1,36 @@
+{
+    "manifest_version": 3,
+    "name": "CommerceHub Packslip Extractor",
+    "version": "1.7",
+    "permissions": [
+        "activeTab",
+        "scripting"
+    ],
+    "host_permissions": [
+        "https://dsm.commercehub.com/*",
+        "https://script.google.com/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "popup.html",
+        "default_icon": {
+            "16": "icons/16.jpg",
+            "48": "icons/48.jpg",
+            "128": "icons/128.jpg"
+        }
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "pdf.js",
+                "pdf.worker.js",
+                "content.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}
