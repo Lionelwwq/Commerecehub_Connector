@@ -2,7 +2,7 @@
 
 // New Apps Script Web App URL (deployed as "Anyone, even anonymous")
 const SCRIPT_URL =
-    'https://script.google.com/macros/s/AKfycbyig9Ex1h1vwMf20AlxrtS6G1llSWVAfNoSjfGTSQTI90e7nBMATWPN1LuUpaC_wIaIEQ/exec';
+    'https://script.google.com/macros/s/AKfycbwRDFWv3Ct8nSgIAPUbjXITndgtC0WfpufTq2gRZk71OznbpeDXAKIKna2CwbTvnrlT8A/exec';
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === 'fetchPdf') {
