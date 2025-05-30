@@ -106,11 +106,18 @@ function sleep(ms) {
                         if (mDate) colG = mDate[1];
                     }
 
-                    // Province
+                    // Province (3rd or 4th line after "VENDU À")
                     if (!colH && low.includes('vendu à')) {
-                        const tgt = lines[i + 3] || '';
-                        const mProv = tgt.match(/,\s*([A-Z]{2})\b/) || tgt.match(/\b([A-Z]{2})\b/);
-                        if (mProv) colH = mProv[1];
+                        // list of all Canadian provinces + US states
+                        const PROV_REGEX = /\b(AB|BC|MB|NB|NL|NS|NT|NU|ON|PE|QC|SK|YT|AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VT|WA|WI|WV|WY)\b/;
+                        for (let offset of [3, 4]) {
+                            const candidate = lines[i + offset] || '';
+                            const mProv = candidate.match(PROV_REGEX);
+                            if (mProv) {
+                                colH = mProv[1];
+                                break;
+                            }
+                        }
                     }
 
                     // Ship To
