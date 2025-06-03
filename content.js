@@ -16,7 +16,7 @@ function sleep(ms) {
     }
     console.log(`Found ${anchors.length} pack-slips.`);
 
-    // Step 1: fetch existing PO list
+    // 1) Fetch the list of existing POs from the background
     const existing = await new Promise(r =>
         chrome.runtime.sendMessage({ action: 'getExistingPOs' }, r)
     );
@@ -33,7 +33,7 @@ function sleep(ms) {
         if (processed >= MAX_PO) break;
 
         try {
-            // fetch PDF bytes
+            // 2) Fetch the PDF binary via the background script
             const pdfResp = await new Promise(r =>
                 chrome.runtime.sendMessage({ action: 'fetchPdf', url: a.href }, r)
             );
@@ -45,7 +45,7 @@ function sleep(ms) {
             const buf = Uint8Array.from(atob(pdfResp.data), c => c.charCodeAt(0));
             const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
 
-            // extract every page's text
+            // 3) Concatenate the text of every page
             let fullText = '';
             for (let p = 1; p <= pdf.numPages; p++) {
                 const page = await pdf.getPage(p);
@@ -53,7 +53,7 @@ function sleep(ms) {
                 fullText += content.items.map(i => i.str).join('\n') + '\n';
             }
 
-            // split into PACKING LIST sections
+            // 4) Split into each “PACKING LIST” section
             const sections = [];
             const secRe = /(?:LISTE D'ENVOI\s*\/\s*PACKING LIST|PACKING LIST)[\s\S]*?(?=(?:LISTE D'ENVOI\s*\/\s*PACKING LIST|PACKING LIST)|$)/gi;
             let m;
@@ -62,57 +62,115 @@ function sleep(ms) {
             }
             console.log(`→ ${sections.length} sections found in this PDF`);
 
+            // 5) Extract fields from each section and send them
             for (const block of sections) {
                 if (processed >= MAX_PO) break;
                 if (!block.trim()) continue;
 
-                const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+                // rawLines keeps every line (including empty ones), which we’ll use by index to match quantities and item numbers
+                const rawLines = block.split('\n');
+                // lines removes empty lines, used for extracting PO, date, province, shipTo
+                const lines = rawLines
+                    .map(l => l.trim())
+                    .filter(Boolean);
 
                 let colD = '', // PO
-                    colE = '', // itemNumber / vendorRef
+                    colE = '', // itemNumber(s), multiple items joined with '&'
                     colG = '', // orderDate
                     colH = '', // province
-                    colI = '', // quantity
+                    colI = '', // quantity(ies), multiple quantities joined with '&'
                     colL = ''; // shipTo
 
-                // 1) Direct data-row parse
-                const dataRow = lines.find(l => {
-                    const parts = l.split(/\s+/);
-                    return parts.length >= 3
-                        && /^\d{6,}$/.test(parts[0])
-                        && /^\d{6,}$/.test(parts[1])
-                        && /^\d+$/.test(parts[2]);
-                });
-                if (dataRow) {
-                    const [, vendorRef, qty] = dataRow.split(/\s+/);
-                    colE = vendorRef;
-                    colI = qty;
+                // ===== ① —— First locate the index of the first line containing “description” =====
+                let postDesc = '';
+                const descLineIdx = rawLines.findIndex(l =>
+                    l.trim().toLowerCase().includes('description')
+                );
+                if (descLineIdx !== -1) {
+                    // After the DESCRIPTION line, join all lines into one large string
+                    postDesc = rawLines.slice(descLineIdx + 1).join('\n');
                 }
 
-                // 2) Per-line scan for PO, provisional date, province, shipTo
+                // ===== ② —— Handle both “combined line” and “split line” formats =====
+                const items = [];
+                const qtys = [];
+
+                if (postDesc) {
+                    const postLines = postDesc.split('\n').map(s => s.trim());
+
+                    // ---- 2.1 Combined-line case: single line like "11464583" or "11464589" ----
+                    for (const line of postLines) {
+                        const mCombo = line.match(/^(\d)(\d{7})$/);
+                        if (mCombo) {
+                            qtys.push(mCombo[1]);
+                            items.push(mCombo[2]);
+                        }
+                    }
+
+                    // ---- 2.2 Split-line case: one line is quantity (e.g., "1"), next line is a 7-digit item number ----
+                    for (let i = 0; i < postLines.length - 1; i++) {
+                        const cur = postLines[i];
+                        const nxt = postLines[i + 1];
+                        if (/^\d$/.test(cur) && /^\d{7}$/.test(nxt)) {
+                            // The combined-line matches have already been handled above; here we only care about single-digit + 7-digit split lines
+                            // If this pair hasn’t been captured by a combined-line match, collect it
+                            const itemNum = nxt;
+                            const qty = cur;
+                            // Prevent duplicates: only add if items doesn’t already include this itemNum
+                            if (!items.includes(itemNum)) {
+                                qtys.push(qty);
+                                items.push(itemNum);
+                            }
+                        }
+                    }
+
+                    if (items.length) {
+                        colE = items.join('&'); // e.g. "1464583&1464589"
+                        colI = qtys.join('&');  // e.g. "1&1"
+                    }
+                }
+
+                // ===== ③ —— If no itemNumber was extracted, fallback to the old dataRow rule =====
+                if (!colE) {
+                    const dataRow = lines.find(l => {
+                        const parts = l.split(/\s+/);
+                        return parts.length >= 3
+                            && /^\d{6,}$/.test(parts[0])
+                            && /^\d{6,}$/.test(parts[1])
+                            && /^\d+$/.test(parts[2]);
+                    });
+                    if (dataRow) {
+                        const [, vendorRef, qty] = dataRow.split(/\s+/);
+                        colE = vendorRef;
+                        colI = qty;
+                    }
+                }
+
+                // ===== ④ —— Scan lines to extract PO, orderDate, province, shipTo =====
                 for (let i = 0; i < lines.length; i++) {
                     const line = lines[i];
                     const low = line.toLowerCase();
 
-                    // Purchase Order
+                    // —— Purchase Order —— purely numeric and length >= 8
                     if (!colD && /^\d{8,}$/.test(line)) {
                         colD = line;
                     }
 
-                    // Date from header fallback — capture only MM/DD/YYYY
+                    // —— orderDate —— when the line contains “costco item,” the previous line usually has “MM/DD/YYYY”
                     if (!colG && low.includes('costco item')) {
-                        const raw = lines[i - 1] || '';
-                        const mDate = raw.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
-                        if (mDate) colG = mDate[1];
+                        const prev = lines[i - 1] || '';
+                        const mDate = prev.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+                        if (mDate) {
+                            colG = mDate[1];
+                        }
                     }
 
-                    // Province (3rd or 4th line after "VENDU À")
+                    // —— province —— when the line contains “vendu à,” 3–4 lines below usually contain the province code
                     if (!colH && low.includes('vendu à')) {
-                        // list of all Canadian provinces + US states
                         const PROV_REGEX = /\b(AB|BC|MB|NB|NL|NS|NT|NU|ON|PE|QC|SK|YT|AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|IA|ID|IL|IN|KS|KY|LA|MA|MD|ME|MI|MN|MO|MS|MT|NC|ND|NE|NH|NJ|NM|NV|NY|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VA|VT|WA|WI|WV|WY)\b/;
                         for (let offset of [3, 4]) {
-                            const candidate = lines[i + offset] || '';
-                            const mProv = candidate.match(PROV_REGEX);
+                            const cand = lines[i + offset] || '';
+                            const mProv = cand.match(PROV_REGEX);
                             if (mProv) {
                                 colH = mProv[1];
                                 break;
@@ -120,33 +178,35 @@ function sleep(ms) {
                         }
                     }
 
-                    // Ship To
+                    // —— shipTo —— if the line contains “ship to:”, the next line is the address
                     if (!colL && low.includes('ship to') && line.includes(':')) {
                         colL = lines[i + 1]?.trim() || '';
                     }
                 }
 
-                // 3) Fallback for colE: last 6–7 digit run
+                // ===== ⑤ —— (Fallback) If still no itemNumber, use the last 7-digit number in the block =====
                 if (!colE) {
-                    const allNums = block.match(/\b\d{6,7}\b/g) || [];
-                    if (allNums.length) {
-                        colE = allNums[allNums.length - 1];
+                    const fallback7 = block.match(/\b\d{7}\b/g) || [];
+                    if (fallback7.length) {
+                        colE = fallback7[fallback7.length - 1];
                     }
                 }
 
-                // 4) Fallback for colG: line immediately before “DESCRIPTION”
+                // ===== ⑥ —— (Fallback) If still no orderDate, extract it from the line above “DESCRIPTION” =====
                 if (!colG) {
-                    const descIdx = lines.findIndex(l => /^description/i.test(l));
-                    if (descIdx > 0) {
-                        const prev = lines[descIdx - 1];
-                        const mDate = prev.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
-                        if (mDate) colG = mDate[1];
+                    const descIdx2 = lines.findIndex(l => l.toLowerCase().includes('description'));
+                    if (descIdx2 > 0) {
+                        const prev = lines[descIdx2 - 1];
+                        const mDate2 = prev.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+                        if (mDate2) {
+                            colG = mDate2[1];
+                        }
                     }
                 }
 
                 const cleanPO = normalizePO(colD);
                 if (cleanPO && !seenPOs.includes(cleanPO)) {
-                    console.log(`✅ New PO ${colD}, sending (item=${colE}, date=${colG})…`);
+                    console.log(`✅ New PO ${colD}, sending (items=${colE}, date=${colG})…`);
                     processed++;
 
                     await sleep(1000);
