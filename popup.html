@@ -9,41 +9,77 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-            background-color: #f9f9f9;
+            background-color: #f4f7fa;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 120px;
-            width: 300px;
+            height: 420px;
+            /* Increased height */
+            width: 520px;
+            /* Increased width */
         }
 
         .container {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 28px 24px 18px 24px;
+            width: 98%;
             text-align: center;
         }
 
         h2 {
-            font-size: 16px;
-            margin-bottom: 12px;
-            color: #333;
+            font-size: 22px;
+            /* Larger font */
+            margin-bottom: 18px;
+            color: #1976d2;
+            letter-spacing: 0.5px;
         }
 
         button {
             background-color: #1976d2;
             color: white;
             border: none;
-            padding: 10px 18px;
-            font-size: 14px;
-            border-radius: 6px;
+            padding: 16px 32px;
+            font-size: 17px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.2s ease-in-out;
+            transition: background 0.2s, box-shadow 0.2s;
+            margin-bottom: 18px;
+            box-shadow: 0 1px 4px rgba(25, 118, 210, 0.08);
         }
 
         button:hover {
-            background-color: #1565c0;
+            background: linear-gradient(90deg, #1976d2 60%, #1565c0 100%);
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.13);
         }
 
         button:active {
             background-color: #0d47a1;
+        }
+
+        .log {
+            background: #f1f3f6;
+            border-radius: 6px;
+            color: #222;
+            font-size: 15px;
+            /* Larger font */
+            text-align: left;
+            padding: 12px 14px;
+            margin: 0 auto 14px auto;
+            height: 220px;
+            /* Much taller */
+            overflow-y: auto;
+            box-sizing: border-box;
+            border: 1px solid #e3e7ed;
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .contact-info {
+            font-size: 13px;
+            color: #888;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -51,8 +87,12 @@
 <body>
     <div class="container">
         <h2>Packslip Extractor</h2>
-        <button id="run">Extract Packslips → Sheet</button>
-        <h5>For Any Issue, Contact technical.support@amaxleather.com</h5>
+        <button id="run" type="button">Extract Packslips → Sheet</button>
+        <div class="log" id="log"></div>
+        <div class="contact-info">
+            For Any Issue, Contact <a
+                href="mailto:technical.support@amaxleather.com">technical.support@amaxleather.com</a>
+        </div>
     </div>
     <script src="popup.js"></script>
 </body>

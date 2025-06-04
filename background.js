@@ -1,8 +1,7 @@
-// background.js
-//test
-// New Apps Script Web App URL (deployed as "Anyone, even anonymous")
 const SCRIPT_URL =
     'https://script.google.com/macros/s/AKfycbzIBURFYw_qJid8idXDypT9ddTlksQ2EbV1uVFjNhZnr8MLxcHIGGINZECYC4BJpjFr3g/exec';
+
+let logBuffer = [];
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.action === 'fetchPdf') {
@@ -54,4 +53,13 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true;
     }
 
+    // LOGGING SUPPORT
+    if (msg.action === 'log') {
+        logBuffer.push(msg.message);
+        // Relay to popup if open
+        chrome.runtime.sendMessage({ action: 'log', message: msg.message });
+    }
+    if (msg.action === 'getLogs') {
+        sendResponse({ logs: logBuffer });
+    }
 });

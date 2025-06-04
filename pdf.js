@@ -837,7 +837,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 2 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -2731,7 +2731,7 @@
                 exports.build = build;
 
                 /***/
-}),
+            }),
 /* 3 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -2871,7 +2871,7 @@
                 exports.PrintAnnotationStorage = PrintAnnotationStorage;
 
                 /***/
-}),
+            }),
 /* 4 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -3202,7 +3202,7 @@
                 exports.AnnotationEditor = AnnotationEditor;
 
                 /***/
-}),
+            }),
 /* 5 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -3882,7 +3882,7 @@
                 exports.AnnotationEditorUIManager = AnnotationEditorUIManager;
 
                 /***/
-}),
+            }),
 /* 6 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -4514,7 +4514,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 7 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -4672,7 +4672,7 @@
                 exports.BaseSVGFactory = BaseSVGFactory;
 
                 /***/
-}),
+            }),
 /* 8 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -4777,7 +4777,7 @@
                 exports.MurmurHash3_64 = MurmurHash3_64;
 
                 /***/
-}),
+            }),
 /* 9 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -5079,7 +5079,7 @@
                 exports.FontFaceObject = FontFaceObject;
 
                 /***/
-}),
+            }),
 /* 10 */
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -5093,7 +5093,7 @@
                 exports.isNodeJS = isNodeJS;
 
                 /***/
-}),
+            }),
 /* 11 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -7314,7 +7314,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 12 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -7772,7 +7772,7 @@
                 exports.TilingPattern = TilingPattern;
 
                 /***/
-}),
+            }),
 /* 13 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -7891,7 +7891,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 14 */
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -7907,7 +7907,7 @@
                 GlobalWorkerOptions.workerSrc = "";
 
                 /***/
-}),
+            }),
 /* 15 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -8321,7 +8321,7 @@
                 exports.MessageHandler = MessageHandler;
 
                 /***/
-}),
+            }),
 /* 16 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -8358,7 +8358,7 @@
                 exports.Metadata = Metadata;
 
                 /***/
-}),
+            }),
 /* 17 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -8562,7 +8562,7 @@
                 exports.OptionalContentConfig = OptionalContentConfig;
 
                 /***/
-}),
+            }),
 /* 18 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -8839,7 +8839,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 19 */
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -8893,7 +8893,7 @@
                 exports.XfaText = XfaText;
 
                 /***/
-}),
+            }),
 /* 20 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -8945,7 +8945,7 @@
                 exports.NodeStandardFontDataFactory = NodeStandardFontDataFactory;
 
                 /***/
-}),
+            }),
 /* 21 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -9296,7 +9296,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 22 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -9369,7 +9369,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 23 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -9510,7 +9510,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 24 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -9930,7 +9930,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 25 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -10148,7 +10148,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 26 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -10527,7 +10527,7 @@
                 }
 
                 /***/
-}),
+            }),
 /* 27 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -10880,7 +10880,7 @@
                 exports.AnnotationEditorLayer = AnnotationEditorLayer;
 
                 /***/
-}),
+            }),
 /* 28 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -11207,7 +11207,7 @@
                 exports.FreeTextEditor = FreeTextEditor;
 
                 /***/
-}),
+            }),
 /* 29 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -11961,7 +11961,7 @@
                 exports.InkEditor = InkEditor;
 
                 /***/
-}),
+            }),
 /* 30 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -14011,7 +14011,7 @@
                 exports.AnnotationLayer = AnnotationLayer;
 
                 /***/
-}),
+            }),
 /* 31 */
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -14068,7 +14068,7 @@
                 exports.ColorConverters = ColorConverters;
 
                 /***/
-}),
+            }),
 /* 32 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -14279,7 +14279,7 @@
                 exports.XfaLayer = XfaLayer;
 
                 /***/
-}),
+            }),
 /* 33 */
 /***/ ((__unused_webpack_module, exports, __w_pdfjs_require__) => {
 
@@ -15554,7 +15554,7 @@
                 }
 
                 /***/
-})
+            })
 /******/]);
 /************************************************************************/
 /******/ 	// The module cache
@@ -15567,14 +15567,14 @@
 /******/ 		if (cachedModule !== undefined) {
 /******/ 			return cachedModule.exports;
                 /******/
-}
+            }
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
 /******/ 			// no module.id needed
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
                 /******/
-};
+            };
 /******/
 /******/ 		// Execute the module function
 /******/ 		__webpack_modules__[moduleId](module, module.exports, __w_pdfjs_require__);
@@ -15582,7 +15582,7 @@
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
             /******/
-}
+        }
         /******/
         /************************************************************************/
         var __webpack_exports__ = {};
@@ -15856,7 +15856,7 @@
 
 /******/ 	return __webpack_exports__;
         /******/
-})()
+    })()
         ;
 });
 //# sourceMappingURL=pdf.js.map

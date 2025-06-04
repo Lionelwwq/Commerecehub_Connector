@@ -1,26 +1,30 @@
-console.log('▶️ Pack-slip extractor starting…');
+log('▶️ Pack-slip extractor starting…');
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('pdf.worker.js');
 
 function sleep(ms) {
     return new Promise(r => setTimeout(r, ms));
 }
-
+function log(msg) {
+    chrome.runtime.sendMessage({ action: 'log', message: msg });
+}
 (async () => {
     const anchors = Array.from(
         document.querySelectorAll('a[href*="downloadFile.do?fileId="]')
     ).filter(a => !a.href.includes('authorize'));
 
     if (!anchors.length) {
+        log('⚠️ No download links found!');
         return alert('⚠️ No download links found!');
     }
-    console.log(`Found ${anchors.length} pack-slips.`);
+    log(`Found ${anchors.length} pack-slips.`);
 
     // 1) Fetch the list of existing POs from the background
     const existing = await new Promise(r =>
         chrome.runtime.sendMessage({ action: 'getExistingPOs' }, r)
     );
     if (!existing.success) {
+        log('❌ Failed to fetch existing PO list.');
         return alert('❌ Failed to fetch existing PO list.');
     }
     const normalizePO = po => po?.toString().replace(/^0+/, '').slice(-12);
@@ -38,7 +42,7 @@ function sleep(ms) {
                 chrome.runtime.sendMessage({ action: 'fetchPdf', url: a.href }, r)
             );
             if (!pdfResp.success) {
-                console.error('PDF fetch failed:', pdfResp.error);
+                log('❌ PDF fetch failed: ' + pdfResp.error);
                 continue;
             }
 
@@ -60,7 +64,7 @@ function sleep(ms) {
             while ((m = secRe.exec(fullText))) {
                 sections.push(m[0]);
             }
-            console.log(`→ ${sections.length} sections found in this PDF`);
+            log(`→ ${sections.length} sections found in this PDF`);
 
             // 5) Extract fields from each section and send them
             for (const block of sections) {
@@ -206,7 +210,7 @@ function sleep(ms) {
 
                 const cleanPO = normalizePO(colD);
                 if (cleanPO && !seenPOs.includes(cleanPO)) {
-                    console.log(`✅ New PO ${colD}, sending (items=${colE}, date=${colG})…`);
+                    log(`✅ New PO ${colD}, sending (items=${colE}, date=${colG})…`);
                     processed++;
 
                     await sleep(1000);
@@ -223,27 +227,28 @@ function sleep(ms) {
                             }
                         }, resp => {
                             if (!resp?.success && resp?.status !== 'skipped') {
-                                console.error('❌ POST failed:', resp?.error || resp);
+                                log('❌ POST failed: ' + (resp?.error || JSON.stringify(resp)));
                             } else {
-                                console.log(`⬆️ Submitted PO ${colD}`);
+                                log(`⬆️ Submitted PO ${colD}`);
                             }
                             r();
                         });
                     });
                 } else if (colD) {
-                    console.log(`⏭️ Skipped duplicate PO ${colD}`);
+                    log(`⏭️ Skipped duplicate PO ${colD}`);
                     processed++;
                 }
             }
         } catch (err) {
-            console.error('❌ Unexpected error:', err);
+            log('❌ Unexpected error: ' + err);
         }
     }
 
-    console.log('🔁 Triggering updatePOStatus…');
+    log('🔁 Triggering updatePOStatus…');
     await new Promise(r =>
         chrome.runtime.sendMessage({ action: 'triggerUpdate' }, r)
     );
 
+    log(`✅ Done! Processed ${processed} pack-slip(s).`);
     alert(`✅ Done! Processed ${processed} pack-slip(s).`);
 })();
